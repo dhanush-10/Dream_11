@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competition Website</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  h1 {
+    text-align: center;
+  }
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  label {
+    margin-bottom: 10px;
+  }
+  input[type="text"] {
+    padding: 8px;
+    margin-left: 5px;
+  }
+  button {
+    padding: 8px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  .remove-btn {
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1> Dream-11 Competition </h1>
+  <form id="matchForm">
+    <label for="matchNumber">Match Number:</label>
+    <input type="text" id="matchNumber" required>
+    <label for="team1">Team A:</label>
+    <input type="text" id="team1" required>
+    <label for="team2">Team B:</label>
+    <input type="text" id="team2" required>
+    <label for="winner">Winner:</label>
+    <input type="text" id="winner" required>
+    <br>
+    <button type="submit">Add Match</button>
+  </form>
+  <table id="matchTable">
+    <thead>
+      <tr>
+        <th>Match Number</th>
+        <th>Team A</th>
+        <th>Team B</th>
+        <th>Winner</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const matchForm = document.getElementById('matchForm');
+    const matchTableBody = document.querySelector('#matchTable tbody');
+
+    function updateLocalStorage() {
+      const matchRows = matchTableBody.querySelectorAll('tr');
+      const matches = Array.from(matchRows).map(row => {
+        const cells = row.querySelectorAll('td');
+        return {
+          matchNumber: cells[0].textContent,
+          team1: cells[1].textContent,
+          team2: cells[2].textContent,
+          winner: cells[3].textContent
+        };
+      });
+      localStorage.setItem('matches', JSON.stringify(matches));
+    }
+
+    function loadMatchesFromLocalStorage() {
+      const matches = JSON.parse(localStorage.getItem('matches')) || [];
+      matches.forEach(match => {
+        const newRow = `
+          <tr>
+            <td>${match.matchNumber}</td>
+            <td>${match.team1}</td>
+            <td>${match.team2}</td>
+            <td>${match.winner}</td>
+            <td><button class="remove-btn">Remove</button></td>
+          </tr>
+        `;
+        matchTableBody.insertAdjacentHTML('beforeend', newRow);
+      });
+    }
+
+    matchForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const matchNumber = document.getElementById('matchNumber').value;
+      const team1 = document.getElementById('team1').value;
+      const team2 = document.getElementById('team2').value;
+      const winner = document.getElementById('winner').value;
+
+      const newRow = `
+        <tr>
+          <td>${matchNumber}</td>
+          <td>${team1}</td>
+          <td>${team2}</td>
+          <td>${winner}</td>
+          <td><button class="remove-btn">Remove</button></td>
+        </tr>
+      `;
+      matchTableBody.insertAdjacentHTML('beforeend', newRow);
+
+      matchForm.reset();
+      updateLocalStorage();
+    });
+
+    matchTableBody.addEventListener('click', function (e) {
+      if (e.target.classList.contains('remove-btn')) {
+        e.target.closest('tr').remove();
+        updateLocalStorage();
+      }
+    });
+
+    loadMatchesFromLocalStorage();
+  });
+</script>
+</body>
+</html>
